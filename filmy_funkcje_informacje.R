@@ -233,7 +233,7 @@ cast <- function(link){
   # odgrywane postacie
   character <- getNodeSet(pages, "//td[@class='character']//div") %>% 
     xml_text %>% stri_trim_both %>% 
-    stri_extract_first_regex("[a-zA-Z ]+")
+    stri_extract_first_regex("[a-zA-Z. ]+")
   # ramka wynikowa
   cast <- data.frame(actor = cast_movie, character = character, 
                      stringsAsFactors = FALSE)
