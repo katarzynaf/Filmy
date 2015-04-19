@@ -214,3 +214,28 @@ production_countries<-function(link){
 
 (kraje_produkcji<-production_countries("http://www.imdb.com/title/tt0099674/"))
 (kraje_produkcji<-production_countries("http://www.imdb.com/title/tt2718492/"))
+
+### obsada 
+
+cast <- function(link){
+  
+  # przejscie do unikalnej strony z obsada
+  link_cast <- paste0(link, "/fullcredits?ref_=tt_cl_sm#cast")
+  pages <- html(link_cast)
+  # aktorzy
+  cast_movie <- getNodeSet(pages, "//span[@class='itemprop']")
+  
+  # jesli brak obsady, zwracamy ramke dane z wartosciami NA
+  if(length(cast_movie)==0) return(data.frame(actor = NA, character = NA))
+  
+  cast_movie <- cast_movie %>% xml_text
+  
+  # odgrywane postacie
+  character <- getNodeSet(pages, "//td[@class='character']//div") %>% 
+    xml_text %>% stri_trim_both %>% 
+    stri_extract_first_regex("[a-zA-Z ]+")
+  # ramka wynikowa
+  cast <- data.frame(actor = cast_movie, character = character, 
+                     stringsAsFactors = FALSE)
+  return(cast)
+}
