@@ -46,12 +46,13 @@ download__movie_url_year <- function(from, to=from){
             dir.create(file.path("movies_link"))
           }
           fname <- paste0("movies_link/", year, ".csv")
-          if(!file.exists(fname))
-          write.table(data.frame(year = year, link = movie_urls),
-                      fname, append = TRUE, row.names=FALSE)
-          else
-            suppressWarnings(write.table(data.frame(year = year, link = movie_urls),
-                        fname, append = TRUE, row.names = FALSE, col.names = FALSE))
+          suppressWarnings(write.table(
+                data.frame(year = year, link = movie_urls),
+                fname,
+                append = TRUE,
+                row.names=FALSE,
+                col.names=!file.exists(fname)
+                      ))
         }
       }
 
