@@ -7,6 +7,12 @@ link<-"http://www.imdb.com/title/tt0463985/"
 #test 2
 link<-"http://www.imdb.com/title/tt3155794/"
 
+merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
+  files<-list.files(paste0(getwd(),"/movies_link"),full.names=TRUE)
+  data<-do.call(rbind,lapply(files,read.table,header=TRUE))
+  data
+}
+
 ##
 title<-function(link){
    page<-html(link)
