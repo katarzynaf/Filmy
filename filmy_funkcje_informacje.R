@@ -2,10 +2,11 @@ library("rvest")
 library("XML")
 library("stringi")
 
+# prosba: linki na koncu bez '/' - tak zapisywane w csv
 #test
-link<-"http://www.imdb.com/title/tt0463985/"
+link<-"http://www.imdb.com/title/tt0463985"
 #test 2
-link<-"http://www.imdb.com/title/tt3155794/"
+link<-"http://www.imdb.com/title/tt3155794"
 
 merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
   files<-list.files(paste0(getwd(),"/movies_link"),full.names=TRUE)
@@ -45,7 +46,7 @@ length_of_movie<-function(link){
    }
 }
 
-(dlugosc_filmu<-length_of_movie("http://www.imdb.com/title/tt0099674/"))
+(dlugosc_filmu<-length_of_movie("http://www.imdb.com/title/tt0099674"))
 
 director<-function(link){
    page<-html(link)
@@ -201,8 +202,8 @@ user_rating_stats<-function(link){
    user_rating_stats
 }
 
-(statystyki<-user_rating_stats("http://www.imdb.com/title/tt0099674/"))
-(statystyki<-user_rating_stats("http://www.imdb.com/title/tt2718492/"))
+(statystyki<-user_rating_stats("http://www.imdb.com/title/tt0099674"))
+(statystyki<-user_rating_stats("http://www.imdb.com/title/tt2718492"))
 
 ##
 production_countries<-function(link){
@@ -232,6 +233,7 @@ cast <- function(link){
   cast_movie <- getNodeSet(pages, "//span[@class='itemprop']")
   
   # jesli brak obsady, zwracamy ramke dane z wartosciami NA
+  # (poki co takie rozwiazanie przy zapisie do bazy zawsze mozna zmienic) 
   if(length(cast_movie)==0) return(data.frame(actor = NA, character = NA))
   
   cast_movie <- cast_movie %>% xml_text
@@ -245,3 +247,5 @@ cast <- function(link){
                      stringsAsFactors = FALSE)
   return(cast)
 }
+
+cast("http://www.imdb.com/title/tt2718492")
