@@ -15,6 +15,16 @@ merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
 }
 
 ##
+merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
+   files<-list.files(paste0(getwd(),"/movies_link"),full.names=TRUE)
+   data<-do.call(rbind,lapply(files,read.table,header=TRUE))
+   data
+}
+
+#zapis do jednego pliku
+#write.table(merge_csv(),"movies_links.csv")
+
+##
 title<-function(link){
    page<-html(link)
    title<-html_nodes(page,".header .itemprop")
