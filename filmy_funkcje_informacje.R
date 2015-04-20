@@ -24,7 +24,7 @@ merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
 #    title<-html_nodes(page,".header .itemprop")
 #    title<-html_text(title)
 # }
-# 
+#
 # (tytul<-title("http://www.imdb.com/title/tt0099674/"))
 
 ##
@@ -34,7 +34,7 @@ merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
 #    year<-html_nodes(page,".header a")
 #    year<-html_text(year) #zwraca character => mozna zmienic na numeric
 # }
-# 
+#
 # (rok<-year("http://www.imdb.com/title/tt0099674/"))
 
 ##
@@ -49,16 +49,29 @@ merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
 #       length_of_movie<-NA
 #    }
 # }
-# 
+#
 # (dlugosc_filmu<-length_of_movie("http://www.imdb.com/title/tt0099674"))
-# 
+#
 # director<-function(link){
 #    page<-html(link)
 #    director<-html_nodes(page,"#overview-top :nth-child(8) .itemprop")
 #    director<-html_text(director)
 # }
-# 
+#
 # (rezyser<-director("http://www.imdb.com/title/tt0099674/"))
+
+language<-function(link){
+   page<-readLines(link)
+   page<-paste(page,collapse="")
+   language<-unlist(stri_extract_all_regex(page,"(?<=Language:).+?(?=</div)"))
+   if(!is.na(language)){
+      language<-unlist(stri_extract_all_regex(language,"(?<=itemprop=\'url\'>).+?(?=</a)"))
+      #zwraca character/NA => mozna zmienic na numeric lub cos innego
+   }
+   else{
+      language<-NA
+   }
+}
 
 #test dla Idy
 #link<-"http://www.imdb.com/title/tt2718492/"
@@ -97,7 +110,7 @@ color<-function(link){ #nie dziala np dla testu 1
    color<-stri_trim(html_text(color))
 }
 
-color2<-function(link){ #nie dziala np dla testu 1
+color2<-function(link){
    page<-readLines(link)
    page<-paste(page, collapse="")
    color<-unlist(stri_extract_all_regex(page,"(?<=Color:).+?(?=</a)"))
@@ -124,7 +137,7 @@ color2<-function(link){ #nie dziala np dla testu 1
 #    genres<-html_nodes(page,".infobar .itemprop")
 #    genres<-html_text(genres)
 # }
-# 
+#
 # (gatunek<-genres("http://www.imdb.com/title/tt0099674/"))
 # (gatunek<-genres("http://www.imdb.com/title/tt2718492/"))
 
@@ -226,28 +239,28 @@ production_countries<-function(link){
 (kraje_produkcji<-production_countries("http://www.imdb.com/title/tt0099674/"))
 (kraje_produkcji<-production_countries("http://www.imdb.com/title/tt2718492/"))
 
-### obsada 
+### obsada
 
 cast <- function(link){
-  
+
   # przejscie do unikalnej strony z obsada
   link_cast <- paste0(link, "/fullcredits?ref_=tt_cl_sm#cast")
   pages <- html(link_cast)
   # aktorzy
   cast_movie <- getNodeSet(pages, "//span[@class='itemprop']")
-  
+
   # jesli brak obsady, zwracamy ramke dane z wartosciami NA
-  # (poki co takie rozwiazanie przy zapisie do bazy zawsze mozna zmienic) 
+  # (poki co takie rozwiazanie przy zapisie do bazy zawsze mozna zmienic)
   if(length(cast_movie)==0) return(data.frame(actor = NA, character = NA))
-  
+
   cast_movie <- cast_movie %>% xml_text
-  
+
   # odgrywane postacie
-  character <- getNodeSet(pages, "//td[@class='character']//div") %>% 
-    xml_text %>% stri_trim_both %>% 
+  character <- getNodeSet(pages, "//td[@class='character']//div") %>%
+    xml_text %>% stri_trim_both %>%
     stri_extract_first_regex("[a-zA-Z. ]+")
   # ramka wynikowa
-  cast <- data.frame(actor = cast_movie, character = character, 
+  cast <- data.frame(actor = cast_movie, character = character,
                      stringsAsFactors = FALSE)
   return(cast)
 }
@@ -259,10 +272,10 @@ cast("http://www.imdb.com/title/tt2718492")
 keywords <- function(link){
   # przejscie do unikalnej strony z keywords
   key_link <- paste0(link, "/keywords?ref_=tttg_ql_4")
-  
+
   pages <- html(key_link)
   # keywords
-  key_movie <- getNodeSet(pages, "//div[@class='sodatext']") %>% 
+  key_movie <- getNodeSet(pages, "//div[@class='sodatext']") %>%
     xml_text %>%
     stri_trim_both
   if(length(key_movie) == 0) return(NA)
