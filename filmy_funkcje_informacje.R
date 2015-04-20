@@ -225,7 +225,7 @@ user_rating_stats<-function(link){
 #user_stats<-statystyki_u
 #votes_stats<-statystyki_r
 
-stats_to_one_row(user_stats,votes_stats){
+stats_to_one_row<-function(user_stats,votes_stats){
    #zapamietujemy dlugosc tabelki, bo ostatni wiersz nam sie przyda
    m<-nrow(user_stats)
    #nazwy kolumn dla tabelki z ocenami
@@ -238,7 +238,7 @@ stats_to_one_row(user_stats,votes_stats){
    #wartosci w wierszu
    row<-c(user_stats[m,3],user_stats[m,2],user_stats$Average[-m],as.character(votes_stats$Votes))
    names(row)<-columns
-   return(row) #zwraca character => mozna na numeric zmienic
+   row #zwraca character => mozna na numeric zmienic
 }
 
 ##
