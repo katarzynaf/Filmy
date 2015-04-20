@@ -60,6 +60,19 @@ merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
 #
 # (rezyser<-director("http://www.imdb.com/title/tt0099674/"))
 
+language<-function(link){
+   page<-readLines(link)
+   page<-paste(page,collapse="")
+   language<-unlist(stri_extract_all_regex(page,"(?<=Language:).+?(?=</div)"))
+   if(!is.na(language)){
+      language<-unlist(stri_extract_all_regex(language,"(?<=itemprop=\'url\'>).+?(?=</a)"))
+      #zwraca character/NA => mozna zmienic na numeric lub cos innego
+   }
+   else{
+      language<-NA
+   }
+}
+
 #test dla Idy
 #link<-"http://www.imdb.com/title/tt2718492/"
 
@@ -259,10 +272,10 @@ cast("http://www.imdb.com/title/tt2718492")
 keywords <- function(link){
   # przejscie do unikalnej strony z keywords
   key_link <- paste0(link, "/keywords?ref_=tttg_ql_4")
-  
+
   pages <- html(key_link)
   # keywords
-  key_movie <- getNodeSet(pages, "//div[@class='sodatext']") %>% 
+  key_movie <- getNodeSet(pages, "//div[@class='sodatext']") %>%
     xml_text %>%
     stri_trim_both
   if(length(key_movie) == 0) return(NA)
