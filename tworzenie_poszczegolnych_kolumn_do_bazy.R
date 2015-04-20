@@ -1,5 +1,15 @@
-link <- "http://www.imdb.com/title/tt0022628"
-    
+library(XML)
+library(rvest)
+library(dplyr)
+library(RCurl)
+library(stringi)
+
+link <- "http://www.imdb.com/title/tt0111495"
+# funkcja pomocnicza do scala wielu informacji w jeden wektor
+scal <- function( co ){
+      paste0(co, collapse = ",")
+}
+
 # info z nodesow
 from_main_page <- function( link ){
       # 1. wydlubanie informacji ze strony glownej filmu nodesami:
@@ -9,21 +19,24 @@ from_main_page <- function( link ){
                      genres=".infobar .itemprop",
                      rating="div.titlePageSprite",
                      votes=".star-box-details a:nth-child(3) span")
+      page <- html(link)
       wydlub <- function(node_name){
-            item <- link %>% html %>% html_nodes( all_nodes[node_name] ) %>% html_text %>% stri_trim
+            item <- page %>% html_nodes( all_nodes[node_name] ) %>% html_text %>% stri_trim
             return(item)
       }
       info_z_glownej <- lapply(names(all_nodes),wydlub)
       names(info_z_glownej) <- names(all_nodes)
+      
       # zmiana formatowania czasu trwania filmu.
       if( length(info_z_glownej$duration)>0 ){
-            info_z_glownej$duration <- unlist(stri_extract_all_regex(duration,"[0-9]+"))  #zwraca character/NA 
+            info_z_glownej$duration <- unlist(stri_extract_all_regex(info_z_glownej$duration,"[0-9]+"))  #zwraca character/NA 
       }else{
             info_z_glownej$duration <- NA
       }
-      return(info_z_glownej)
+      # zmiana gatunkow na wiele kolumn
+      info_z_glownej$genres <- scal(info_z_glownej$genres)
+      return(as.data.frame(info_z_glownej))
 }
-from_main_page(link)
 
 # info z readHTMLTable
 from_full_cast_n_crew <- function( link ){
@@ -31,6 +44,7 @@ from_full_cast_n_crew <- function( link ){
       
       link <- paste0(link, ifelse(stri_sub(link,-1)=="/", "", "/"), "fullcredits") 
       tables <- link %>% readHTMLTable          # wczytanie wszystkich tabel z podstrony Cast&Crew    
+      n <- length(tables)
       headers <- link %>%                       # wczytanie naglowkow tabelek
             html %>% html_nodes("h4") %>% html_text %>% "["(1:n)
       # Zamieniam najistotniejsze nazwy, aby byly uniwersalne dla kazdej
@@ -42,22 +56,20 @@ from_full_cast_n_crew <- function( link ){
       headers[ stri_detect_regex(headers, "Music [B|b]y") ] <- tytuly_kolumn[5]
       headers[ stri_detect_regex(headers, "Cinematography") ] <- tytuly_kolumn[6]  
       # Nadanie nazw tabelom:
-      names(tables) <- c(headers[1:(n-1)])
+      names(tables) <- headers
       tables$Cast <- tables$Cast[,-1]      # pierwsza kolumna Cast jest pusta, bo jest na zdjecia.
       # Wydobycie *pierwszych* kolumn tabel: interesuja nas tylko nazwiska aktorow, a nie np. ze Eddie Murphy byl glosem Osla.
       info_z_cast_crew <- lapply(tytuly_kolumn, function(h){
             zawartosc_tabelki <- as.character(tables[[h]][,1])
-            paste0(zawartosc_tabelki[nchar(zawartosc_tabelki)>1], collapse = ";")
+            scal(zawartosc_tabelki[nchar(zawartosc_tabelki)>1])
             # nchar>1 dlatego, ze czasem \n bierze jako char dlugosci=1.
       })
       names(info_z_cast_crew) <- tytuly_kolumn
-      return(info_z_cast_crew)
+      return(as.data.frame(info_z_cast_crew))
 }
-from_full_cast_n_crew( link )
-
 
 # info z readLines
-from_page_source <- function(link){
+from_page_source <- function( link ){
       page <- readLines(link)
       page <- paste(page, collapse="")
       znaczniki <- c(production_countries="(?<=Country:).+?(?=</div)",
@@ -67,7 +79,7 @@ from_page_source <- function(link){
             item <- unlist(stri_extract_all_regex(page,znacznik))
             if(!is.na(item)){
                   item <- unlist(stri_extract_all_regex(item,"(?<=itemprop=\'url\'>)([a-zA-Z]| )+"))
-                  paste0(item,collapse = ";")
+                  paste0(item,collapse = ",")
             }else
                   item <- NA
       }
@@ -75,7 +87,6 @@ from_page_source <- function(link){
       names(a) <- names(znaczniki)
       return(a)
 }
-from_page_source( link )
       
 # keywords
 keywords <- function(link){
@@ -88,8 +99,14 @@ keywords <- function(link){
             stri_trim_both
       if(length(key_movie) == 0) return(NA)
       # zwracamy wektor
-      return(paste0(key_movie,collapse = ";"))
+      vec <- scal(key_movie)
+      names(vec) <- "keywords"
+      return(vec)
 }
 
-keywords( link )
+
+(a <- from_main_page(link))
+(b <- from_full_cast_n_crew( link ))
+(c <- from_page_source( link ))
+(d <- keywords( link ))
 
