@@ -20,7 +20,7 @@ library(dplyr)
 library(RCurl)
 library(stringi)
 
-#link <- "http://www.imdb.com/title/tt0023694"
+#link <- "http://www.imdb.com/title/tt0023458"
 
 napisy_koncowe <- function(link){
       
@@ -32,9 +32,8 @@ napisy_koncowe <- function(link){
                      duration="#overview-top time",         #zwraca character => mozna zmienic na numeric
                      genres=".infobar .itemprop",
                      rating="div.titlePageSprite")
-      
       wydlubanie <- function(node_name){
-            item <- main_page %>% html_nodes(all_nodes[node_name]) %>% html_text %>% stri_trim
+            item <- main_page %>% html_nodes( all_nodes[node_name] ) %>% html_text %>% stri_trim
             return(item)
       }
       
@@ -51,7 +50,7 @@ napisy_koncowe <- function(link){
       # 2. przejscie do strony z tabela informacji:
       link <- paste0(link, ifelse(stri_sub(link,-1)=="/", "", "/"), "fullcredits?ref_=tt_ov_st_sm")
       
-      # 3. Pobranie tabelki
+      # 3. Pobranie tabel i ich nazw
       tables <- link %>% readHTMLTable          # wczytanie wszystkich tabel z podstrony Cast&Crew    
       n <- length(tables)
       tables <- tables[-n]                      # usuwanie ostatniej tabelki z informacjami amazona. Od teraz mamy n-1 tabelek.
@@ -70,8 +69,13 @@ napisy_koncowe <- function(link){
       headers <- stri_trim(stri_replace_all_regex(headers, " ", ""))
       # Nadawanie nazw tabelom:
       names(tables) <- c(headers[1:(n-1)])
-      # 5.Laczenie inforamcji ze strony glownej z tabelka:
-      tables <- append(info_z_glownej, tables)
+
+      # tabela Cast ma pusta pierwsza kolumne (fotografie aktorow) i trzecia (bezsensowne kropki)
+      # pozostale maja pusta druga kolumne (bezsensowne kropki)
+      tables$Cast <- tables$Cast[,-1]
+      tables <- lapply(tables, function(tabelka) tabelka[,-2])
       
-      return(tables)  
+      # 5.Laczenie inforamcji ze strony glownej z tabelka:
+      total_list <- append(info_z_glownej, tables)
+      return(total_list)  
 }
