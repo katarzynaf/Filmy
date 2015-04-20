@@ -24,8 +24,8 @@ merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
 #    title<-html_nodes(page,".header .itemprop")
 #    title<-html_text(title)
 # }
-# 
-# (tytul<-title("http://www.imdb.com/title/tt0099674/"))
+#
+# (tytul<-title("http://www.imdb.com/title/tt0099674"))
 
 ##
 # year<-function(link){
@@ -34,8 +34,8 @@ merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
 #    year<-html_nodes(page,".header a")
 #    year<-html_text(year) #zwraca character => mozna zmienic na numeric
 # }
-# 
-# (rok<-year("http://www.imdb.com/title/tt0099674/"))
+#
+# (rok<-year("http://www.imdb.com/title/tt0099674"))
 
 ##
 # length_of_movie<-function(link){
@@ -49,29 +49,42 @@ merge_csv<-function(){ ##funkcja sklejaca wszystkie csv do jednej ramki danych
 #       length_of_movie<-NA
 #    }
 # }
-# 
+#
 # (dlugosc_filmu<-length_of_movie("http://www.imdb.com/title/tt0099674"))
-# 
+#
 # director<-function(link){
 #    page<-html(link)
 #    director<-html_nodes(page,"#overview-top :nth-child(8) .itemprop")
 #    director<-html_text(director)
 # }
-# 
-# (rezyser<-director("http://www.imdb.com/title/tt0099674/"))
+#
+# (rezyser<-director("http://www.imdb.com/title/tt0099674"))
+
+language<-function(link){
+   page<-readLines(link)
+   page<-paste(page,collapse="")
+   language<-unlist(stri_extract_all_regex(page,"(?<=Language:).+?(?=</div)"))
+   if(!is.na(language)){
+      language<-unlist(stri_extract_all_regex(language,"(?<=itemprop=\'url\'>).+?(?=</a)"))
+      #zwraca character/NA => mozna zmienic na numeric lub cos innego
+   }
+   else{
+      language<-NA
+   }
+}
 
 #test dla Idy
-#link<-"http://www.imdb.com/title/tt2718492/"
+#link<-"http://www.imdb.com/title/tt2718492"
 
 ##
-budget<-function(link){ #nie kazdy film ma budget - Ida np. nie ma http://www.imdb.com/title/tt2718492/
+budget<-function(link){ #nie kazdy film ma budget - Ida np. nie ma http://www.imdb.com/title/tt2718492
    page<-html(link)
    budget<-html_nodes(page,"#titleDetails :nth-child(11)")
    budget<-html_text(budget)
    budget<-paste(unlist(stri_extract_all_regex(budget,"[0-9]+")),collapse="") #zwraca character => mozna zmienic na numeric
 }
 
-budget2<-function(link){ #nie kazdy film ma budget - Ida np. nie ma http://www.imdb.com/title/tt2718492/ - ta funkcja omija ten problem
+budget2<-function(link){ #nie kazdy film ma budget - Ida np. nie ma http://www.imdb.com/title/tt2718492 - ta funkcja omija ten problem
    page<-readLines(link)
    page<-paste(page, collapse="")
    budget<-unlist(stri_extract_all_regex(page,"(?<=Budget:).+?(?=<span)"))
@@ -84,11 +97,11 @@ budget2<-function(link){ #nie kazdy film ma budget - Ida np. nie ma http://www.i
    }
 }
 
-(budzet<-budget("http://www.imdb.com/title/tt0099674/"))
-(budzet2<-budget2("http://www.imdb.com/title/tt0099674/"))
+(budzet<-budget("http://www.imdb.com/title/tt0099674"))
+(budzet2<-budget2("http://www.imdb.com/title/tt0099674"))
 
-(budzet<-budget("http://www.imdb.com/title/tt2718492/")) #to nie dziala prawidlowo - zczytuje zarobek w dniu premiery
-(budzet2<-budget2("http://www.imdb.com/title/tt2718492/"))
+(budzet<-budget("http://www.imdb.com/title/tt2718492")) #to nie dziala prawidlowo - zczytuje zarobek w dniu premiery
+(budzet2<-budget2("http://www.imdb.com/title/tt2718492"))
 
 ##
 color<-function(link){ #nie dziala np dla testu 1
@@ -97,7 +110,7 @@ color<-function(link){ #nie dziala np dla testu 1
    color<-stri_trim(html_text(color))
 }
 
-color2<-function(link){ #nie dziala np dla testu 1
+color2<-function(link){
    page<-readLines(link)
    page<-paste(page, collapse="")
    color<-unlist(stri_extract_all_regex(page,"(?<=Color:).+?(?=</a)"))
@@ -110,13 +123,13 @@ color2<-function(link){ #nie dziala np dla testu 1
    }
 }
 
-(kolor<-color("http://www.imdb.com/title/tt0099674/"))
-(kolor<-color("http://www.imdb.com/title/tt2718492/"))
-(kolor<-color("http://www.imdb.com/title/tt0463985/")) #nie dziala prawidlowo
+(kolor<-color("http://www.imdb.com/title/tt0099674"))
+(kolor<-color("http://www.imdb.com/title/tt2718492"))
+(kolor<-color("http://www.imdb.com/title/tt0463985")) #nie dziala prawidlowo
 
-(kolor<-color2("http://www.imdb.com/title/tt0099674/"))
-(kolor<-color2("http://www.imdb.com/title/tt2718492/"))
-(kolor<-color2("http://www.imdb.com/title/tt0463985/")) #to juz dziala prawidlowo
+(kolor<-color2("http://www.imdb.com/title/tt0099674"))
+(kolor<-color2("http://www.imdb.com/title/tt2718492"))
+(kolor<-color2("http://www.imdb.com/title/tt0463985")) #to juz dziala prawidlowo
 
 ##
 # genres<-function(link){
@@ -124,9 +137,9 @@ color2<-function(link){ #nie dziala np dla testu 1
 #    genres<-html_nodes(page,".infobar .itemprop")
 #    genres<-html_text(genres)
 # }
-# 
-# (gatunek<-genres("http://www.imdb.com/title/tt0099674/"))
-# (gatunek<-genres("http://www.imdb.com/title/tt2718492/"))
+#
+# (gatunek<-genres("http://www.imdb.com/title/tt0099674"))
+# (gatunek<-genres("http://www.imdb.com/title/tt2718492"))
 
 ## nastepne 4 funkcje mozna jakos sprobowac skleic
 # rating<-function(link){
@@ -148,11 +161,11 @@ rating2<-function(link){ #ta raczej zawsze zadziala, nie wiem jak poprzednia :P
    rating<-unlist(stri_extract_all_regex(rating,"(?<=of ).+(?= /)")) #zwraca character => mozna na numeric zmienic
 }
 
-(ocena<-rating("http://www.imdb.com/title/tt0099674/"))
-(ocena<-rating("http://www.imdb.com/title/tt2718492/"))
+(ocena<-rating("http://www.imdb.com/title/tt0099674"))
+(ocena<-rating("http://www.imdb.com/title/tt2718492"))
 
-(ocena<-rating2("http://www.imdb.com/title/tt0099674/"))
-(ocena<-rating2("http://www.imdb.com/title/tt2718492/"))
+(ocena<-rating2("http://www.imdb.com/title/tt0099674"))
+(ocena<-rating2("http://www.imdb.com/title/tt2718492"))
 
 ##
 votes<-function(link){
@@ -168,8 +181,8 @@ votes<-function(link){
    votes<-unlist(stri_extract_all_regex(votes,"^[0-9]+")) #zwraca character => mozna na numeric zmienic
 }
 
-(glosy<-votes("http://www.imdb.com/title/tt0099674/"))
-(glosy<-votes("http://www.imdb.com/title/tt2718492/"))
+(glosy<-votes("http://www.imdb.com/title/tt0099674"))
+(glosy<-votes("http://www.imdb.com/title/tt2718492"))
 
 ##
 rating_stats<-function(link){
@@ -185,8 +198,8 @@ rating_stats<-function(link){
    rating_stats
 }
 
-(statystyki<-rating_stats("http://www.imdb.com/title/tt0099674/"))
-(statystyki<-rating_stats("http://www.imdb.com/title/tt2718492/"))
+(statystyki_r<-rating_stats("http://www.imdb.com/title/tt0099674"))
+(statystyki_r<-rating_stats("http://www.imdb.com/title/tt2718492"))
 
 ##
 user_rating_stats<-function(link){
@@ -206,8 +219,27 @@ user_rating_stats<-function(link){
    user_rating_stats
 }
 
-(statystyki<-user_rating_stats("http://www.imdb.com/title/tt0099674"))
-(statystyki<-user_rating_stats("http://www.imdb.com/title/tt2718492"))
+(statystyki_u<-user_rating_stats("http://www.imdb.com/title/tt0099674"))
+(statystyki_u<-user_rating_stats("http://www.imdb.com/title/tt2718492"))
+
+#user_stats<-statystyki_u
+#votes_stats<-statystyki_r
+
+stats_to_one_row(user_stats,votes_stats){
+   #zapamietujemy dlugosc tabelki, bo ostatni wiersz nam sie przyda
+   m<-nrow(user_stats)
+   #nazwy kolumn dla tabelki z ocenami
+   cols_user_stats<-as.character(user_stats$Who[-m])
+   cols_user_stats<-stri_replace_all_regex(cols_user_stats," ","_")
+   #nazwy kolumn dla tabelki z glosami
+   cols_votes_stats<-paste0("Vote_",as.character(votes_stats$Rating))
+   #nazwy kolumn
+   columns<-c("Overall_Rating","Votes",cols_user_stats,cols_votes_stats)
+   #wartosci w wierszu
+   row<-c(user_stats[m,3],user_stats[m,2],user_stats$Average[-m],as.character(votes_stats$Votes))
+   names(row)<-columns
+   return(row) #zwraca character => mozna na numeric zmienic
+}
 
 ##
 production_countries<-function(link){
@@ -223,31 +255,31 @@ production_countries<-function(link){
    }
 }
 
-(kraje_produkcji<-production_countries("http://www.imdb.com/title/tt0099674/"))
-(kraje_produkcji<-production_countries("http://www.imdb.com/title/tt2718492/"))
+(kraje_produkcji<-production_countries("http://www.imdb.com/title/tt0099674"))
+(kraje_produkcji<-production_countries("http://www.imdb.com/title/tt2718492"))
 
-### obsada 
+### obsada
 
 cast <- function(link){
-  
+
   # przejscie do unikalnej strony z obsada
   link_cast <- paste0(link, "/fullcredits?ref_=tt_cl_sm#cast")
   pages <- html(link_cast)
   # aktorzy
   cast_movie <- getNodeSet(pages, "//span[@class='itemprop']")
-  
+
   # jesli brak obsady, zwracamy ramke dane z wartosciami NA
-  # (poki co takie rozwiazanie przy zapisie do bazy zawsze mozna zmienic) 
+  # (poki co takie rozwiazanie przy zapisie do bazy zawsze mozna zmienic)
   if(length(cast_movie)==0) return(data.frame(actor = NA, character = NA))
-  
+
   cast_movie <- cast_movie %>% xml_text
-  
+
   # odgrywane postacie
-  character <- getNodeSet(pages, "//td[@class='character']//div") %>% 
-    xml_text %>% stri_trim_both %>% 
+  character <- getNodeSet(pages, "//td[@class='character']//div") %>%
+    xml_text %>% stri_trim_both %>%
     stri_extract_first_regex("[a-zA-Z. ]+")
   # ramka wynikowa
-  cast <- data.frame(actor = cast_movie, character = character, 
+  cast <- data.frame(actor = cast_movie, character = character,
                      stringsAsFactors = FALSE)
   return(cast)
 }
@@ -259,10 +291,10 @@ cast("http://www.imdb.com/title/tt2718492")
 keywords <- function(link){
   # przejscie do unikalnej strony z keywords
   key_link <- paste0(link, "/keywords?ref_=tttg_ql_4")
-  
+
   pages <- html(key_link)
   # keywords
-  key_movie <- getNodeSet(pages, "//div[@class='sodatext']") %>% 
+  key_movie <- getNodeSet(pages, "//div[@class='sodatext']") %>%
     xml_text %>%
     stri_trim_both
   if(length(key_movie) == 0) return(NA)
