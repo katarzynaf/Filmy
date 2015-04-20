@@ -7,6 +7,7 @@ library(dplyr)
 # pobieranie www kazdego filmu
 download__movie_url_year <- function(from, to=from){
   stopifnot(from <= to)
+  stopifnot( from>=1874)  # wczesniejsze lata w linku ponizej powoduja wyswietlenie sie roznych filmow z obecnych lat.
   IMBD = "http://www.imdb.com/"
 
   # petla po latach, z ktorych maja być sciagniete filmy
@@ -60,4 +61,4 @@ download__movie_url_year <- function(from, to=from){
   }
   return(invisible(NA))
 }
-download__movie_url_year(1910, 1920)
+download__movie_url_year(1874, 2015)
