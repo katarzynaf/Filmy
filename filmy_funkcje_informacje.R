@@ -225,7 +225,7 @@ user_rating_stats<-function(link){
 #user_stats<-statystyki_u
 #votes_stats<-statystyki_r
 
-stats_to_data_frame(user_stats,votes_stats){
+stats_to_one_row(user_stats,votes_stats){
    #zapamietujemy dlugosc tabelki, bo ostatni wiersz nam sie przyda
    m<-nrow(user_stats)
    #nazwy kolumn dla tabelki z ocenami
