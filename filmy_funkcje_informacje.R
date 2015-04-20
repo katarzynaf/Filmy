@@ -238,7 +238,7 @@ stats_to_one_row<-function(user_stats,votes_stats){
    #wartosci w wierszu
    row<-c(user_stats[m,3],user_stats[m,2],user_stats$Average[-m],as.character(votes_stats$Votes))
    names(row)<-columns
-   row #zwraca character => mozna na numeric zmienic
+   return(row) #zwraca character => mozna na numeric zmienic
 }
 
 ##
