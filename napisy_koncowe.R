@@ -44,9 +44,15 @@ napisy_koncowe <- function(link){
       headers[ stri_detect_regex(headers, "Music [B|b]y") ] <- "Musicby"
       headers[ stri_detect_regex(headers, "Cinematography") ] <- "Cinematographyby"
       # A w reszcie usuwam spacje:
-      headers <- stri_replace_all_regex(headers, " ", "")
-      # Nadawanie nazw
-      tables <- append(title,tables)
-      names(tables) <- c("Title",headers[1:(n-1)])
+      headers <- stri_trim(stri_replace_all_regex(headers, " ", ""))
+      # Nadawanie nazw tabelom:
+      names(tables) <- c("title", headers[1:(n-1)])
+      
+      # tabela Cast ma pusta pierwsza kolumne (fotografie aktorow) i trzecia (bezsensowne kropki)
+      # pozostale maja pusta druga kolumne (bezsensowne kropki)
+      tables$Cast <- tables$Cast[,-1]
+      tables <- lapply(tables, function(tabelka) tabelka[,-2])
+
+      tables <- append(title, tables)
       return(tables)  
 }
