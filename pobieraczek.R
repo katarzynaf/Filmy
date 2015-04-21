@@ -96,7 +96,6 @@ keywords <- function(link) {
       return(vec)
 } 
 
-
 pobieraczek <- function(from, to=from){
       
       if(!file.exists(file.path("dane"))){
@@ -126,7 +125,10 @@ pobieraczek <- function(from, to=from){
             plik_linkow <- read.table(which_to_download[j],header=TRUE)$link
             liczba_linkow <- length(plik_linkow)
             i=1
-            open(con,"a")
+            write.table(t(c("title","year","duration","genres","rating","votes","DirectedBy","Cast","Writing","ProducedBy",
+                          "MusicBy","CinematographyBy","production_countries","language","color","keywords")),
+                        file=names_of_table[j], row.names=FALSE, col.names=FALSE, sep=";")
+            open(con,"a+")
             while( i <= liczba_linkow ){
                   link <- as.character(plik_linkow[i])
                   a <- from_main_page(link)
@@ -137,7 +139,7 @@ pobieraczek <- function(from, to=from){
                         write.table(
                               as.data.frame(c(a,b,c,d)),
                               file=names_of_table[j], append=TRUE, sep=";", row.names=FALSE,
-                              col.names=!( file.exists(names_of_table[j]) )
+                              col.names=FALSE #!file.exists(names_of_table[j])
                         )
                   )
                   i=i+1
@@ -147,4 +149,4 @@ pobieraczek <- function(from, to=from){
       cat("\nDone\n")
 }
 
-pobieraczek(1894)
+pobieraczek(1899)
