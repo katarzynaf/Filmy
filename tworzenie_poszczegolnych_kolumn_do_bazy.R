@@ -4,7 +4,7 @@ library(dplyr)
 library(RCurl)
 library(stringi)
 
-link <- "http://www.imdb.com/title/tt0111495"
+link <- "http://www.imdb.com/title/tt3844454/"
 # funkcja pomocnicza do scala wielu informacji w jeden wektor
 scal <- function( co ){
       paste0(co, collapse = ",")
@@ -22,17 +22,16 @@ from_main_page <- function( link ){
       page <- html(link)
       wydlub <- function(node_name){
             item <- page %>% html_nodes( all_nodes[node_name] ) %>% html_text %>% stri_trim
-            return(item)
+            if( length(item)>0 ) return(item)
+            else return(NA)
       }
       info_z_glownej <- lapply(names(all_nodes),wydlub)
       names(info_z_glownej) <- names(all_nodes)
       
       # zmiana formatowania czasu trwania filmu.
-      if( length(info_z_glownej$duration)>0 ){
+      if( length(info_z_glownej$duration)>0 )
             info_z_glownej$duration <- unlist(stri_extract_all_regex(info_z_glownej$duration,"[0-9]+"))  #zwraca character/NA 
-      }else{
-            info_z_glownej$duration <- NA
-      }
+
       # zmiana gatunkow na wiele kolumn
       info_z_glownej$genres <- scal(info_z_glownej$genres)
       return(as.data.frame(info_z_glownej))
@@ -104,9 +103,4 @@ keywords <- function(link){
       return(vec)
 }
 
-
-(a <- from_main_page(link))
-(b <- from_full_cast_n_crew( link ))
-(c <- from_page_source( link ))
-(d <- keywords( link ))
-
+from_main_page(link)
