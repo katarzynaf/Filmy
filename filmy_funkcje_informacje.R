@@ -11,7 +11,8 @@ link<-"http://www.imdb.com/title/tt3155794"
 ##
 merge_csv<-function(folder){ ##funkcja sklejaca wszystkie csv do jednej ramki danych,
    #folder musi sie zaczynac od "/" np "/movies_link"
-   files<-list.files(paste0(getwd(),folder),full.names=TRUE)
+      # EDIT: juz nie musi :P:P [kf]
+   files<-list.files(paste0(getwd(),"/", folder),full.names=TRUE)
    data<-do.call(rbind,lapply(files,read.table,header=TRUE))
    data
 }
@@ -60,19 +61,19 @@ merge_csv<-function(folder){ ##funkcja sklejaca wszystkie csv do jednej ramki da
 # }
 #
 # (rezyser<-director("http://www.imdb.com/title/tt0099674"))
-
-language<-function(link){
-   page<-readLines(link)
-   page<-paste(page,collapse="")
-   language<-unlist(stri_extract_all_regex(page,"(?<=Language:).+?(?=</div)"))
-   if(!is.na(language)){
-      language<-unlist(stri_extract_all_regex(language,"(?<=itemprop=\'url\'>).+?(?=</a)"))
-      #zwraca character/NA => mozna zmienic na numeric lub cos innego
-   }
-   else{
-      language<-NA
-   }
-}
+# 
+# language<-function(link){
+#    page<-readLines(link)
+#    page<-paste(page,collapse="")
+#    language<-unlist(stri_extract_all_regex(page,"(?<=Language:).+?(?=</div)"))
+#    if(!is.na(language)){
+#       language<-unlist(stri_extract_all_regex(language,"(?<=itemprop=\'url\'>).+?(?=</a)"))
+#       #zwraca character/NA => mozna zmienic na numeric lub cos innego
+#    }
+#    else{
+#       language<-NA
+#    }
+# }
 
 #test dla Idy
 #link<-"http://www.imdb.com/title/tt2718492"
@@ -111,18 +112,18 @@ color<-function(link){ #nie dziala np dla testu 1
    color<-stri_trim(html_text(color))
 }
 
-color2<-function(link){
-   page<-readLines(link)
-   page<-paste(page, collapse="")
-   color<-unlist(stri_extract_all_regex(page,"(?<=Color:).+?(?=</a)"))
-   if(!is.na(color)){
-      color<-unlist(stri_extract_all_regex(color,"([a-zA-Z]| )+$"))
-      color<-stri_trim(color) #zwraca character/NA => mozna zmienic na numeric lub cos innego
-   }
-   else{
-      color<-NA
-   }
-}
+# color2<-function(link){
+#    page<-readLines(link)
+#    page<-paste(page, collapse="")
+#    color<-unlist(stri_extract_all_regex(page,"(?<=Color:).+?(?=</a)"))
+#    if(!is.na(color)){
+#       color<-unlist(stri_extract_all_regex(color,"([a-zA-Z]| )+$"))
+#       color<-stri_trim(color) #zwraca character/NA => mozna zmienic na numeric lub cos innego
+#    }
+#    else{
+#       color<-NA
+#    }
+# }
 
 (kolor<-color("http://www.imdb.com/title/tt0099674"))
 (kolor<-color("http://www.imdb.com/title/tt2718492"))
@@ -168,19 +169,19 @@ rating2<-function(link){ #ta raczej zawsze zadziala, nie wiem jak poprzednia :P
 (ocena<-rating2("http://www.imdb.com/title/tt0099674"))
 (ocena<-rating2("http://www.imdb.com/title/tt2718492"))
 
-##
-votes<-function(link){
-   if(stri_sub(link,-1)=="/"){
-      link<-paste0(link,"ratings")
-   }
-   else{
-      link<-paste0(link,"/ratings")
-   }
-   page<-html(link)
-   votes<-votes<-html_nodes(page,"p:nth-child(4)")
-   votes<-stri_trim(html_text(votes))
-   votes<-unlist(stri_extract_all_regex(votes,"^[0-9]+")) #zwraca character => mozna na numeric zmienic
-}
+## Votes idzie latwo nodesem zrobic z poziomu strony glownej :)
+# votes<-function(link){
+#    if(stri_sub(link,-1)=="/"){
+#       link<-paste0(link,"ratings")
+#    }
+#    else{
+#       link<-paste0(link,"/ratings")
+#    }
+#    page<-html(link)
+#    votes<-votes<-html_nodes(page,"p:nth-child(4)")
+#    votes<-stri_trim(html_text(votes))
+#    votes<-unlist(stri_extract_all_regex(votes,"^[0-9]+")) #zwraca character => mozna na numeric zmienic
+# }
 
 (glosy<-votes("http://www.imdb.com/title/tt0099674"))
 (glosy<-votes("http://www.imdb.com/title/tt2718492"))
@@ -269,18 +270,18 @@ stats_to_one_row<-function(link,user_stats=user_rating_stats(link),votes_stats=r
 }
 
 ##
-production_countries<-function(link){
-   page<-readLines(link)
-   page<-paste(page, collapse="")
-   production_countries<-unlist(stri_extract_all_regex(page,"(?<=Country:).+?(?=</div)"))
-   if(!is.na(production_countries)){
-      production_countries<-unlist(stri_extract_all_regex(production_countries,"(?<=itemprop=\'url\'>).+?(?=</a)"))
-      #zwraca character/NA => mozna zmienic na numeric lub cos innego
-   }
-   else{
-      production_countries<-NA
-   }
-}
+# production_countries<-function(link){
+#    page<-readLines(link)
+#    page<-paste(page, collapse="")
+#    production_countries<-unlist(stri_extract_all_regex(page,"(?<=Country:).+?(?=</div)"))
+#    if(!is.na(production_countries)){
+#       production_countries<-unlist(stri_extract_all_regex(production_countries,"(?<=itemprop=\'url\'>).+?(?=</a)"))
+#       #zwraca character/NA => mozna zmienic na numeric lub cos innego
+#    }
+#    else{
+#       production_countries<-NA
+#    }
+# }
 
 (kraje_produkcji<-production_countries("http://www.imdb.com/title/tt0099674"))
 (kraje_produkcji<-production_countries("http://www.imdb.com/title/tt2718492"))
@@ -315,18 +316,18 @@ cast("http://www.imdb.com/title/tt2718492")
 
 ### keywords
 
-keywords <- function(link){
-  # przejscie do unikalnej strony z keywords
-  key_link <- paste0(link, "/keywords?ref_=tttg_ql_4")
-
-  pages <- html(key_link)
-  # keywords
-  key_movie <- getNodeSet(pages, "//div[@class='sodatext']") %>%
-    xml_text %>%
-    stri_trim_both
-  if(length(key_movie) == 0) return(NA)
-  # zwracamy wektor
-  return(key_movie)
-}
-
-keywords("http://www.imdb.com/title/tt0008634")
+# keywords <- function(link){
+#   # przejscie do unikalnej strony z keywords
+#   key_link <- paste0(link, "/keywords?ref_=tttg_ql_4")
+# 
+#   pages <- html(key_link)
+#   # keywords
+#   key_movie <- getNodeSet(pages, "//div[@class='sodatext']") %>%
+#     xml_text %>%
+#     stri_trim_both
+#   if(length(key_movie) == 0) return(NA)
+#   # zwracamy wektor
+#   return(key_movie)
+# }
+# 
+# keywords("http://www.imdb.com/title/tt0008634")
