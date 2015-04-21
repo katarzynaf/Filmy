@@ -3,7 +3,7 @@ library("XML")
 
 table_rating<-function(file){
    links<-as.character(read.table(file,header=TRUE)$link)
-   data_frame<-as.data.frame(do.call(rbind,lapply(links,stats_to_one_row)))
+   data_frame<-do.call(rbind,lapply(links,stats_to_one_row))
 }
 
 from<-1800
@@ -34,5 +34,7 @@ save_table_rating<-function(from,to){
       table<-table_rating(files[i])
       write.table(table,names_of_table[i])
    }
+   return(invisible(NULL))
 }
 
+save_table_rating(from,to)
