@@ -2,14 +2,19 @@
 # jednego folderu i on z niego wszystko automatycznie laczy i pobiera :)
 # poprawilam na te potrzeby fnkcje merge.csv() (tzn. zdazyl to zrobic Piotrek lub Martyna
 # ale jeszcze dopisalam Wam tam "/" :P)
+library(XML)
+library(rvest)
+library(dplyr)
+library(RCurl)
+library(stringi)
 
 folder_z_moja_czescia <- "test_linki"
 file_destination <- "rekordy"
 
-pobieraczek <- funkcja( file_destination, folder_z_moja_czescia ){
+pobieraczek <- function( file_destination, folder_z_moja_czescia ){
       
       plik_linkow <- merge_csv( folder_z_moja_czescia )
-      dest_file <- paste( destination,"csv",sep="." )
+      dest_file <- paste( file_destination,"csv",sep="." )
       if( dest_file%in%list.files(getwd()) )
             message("Dopisuje dane do istniejacego pliku!")
       
@@ -36,5 +41,5 @@ pobieraczek <- funkcja( file_destination, folder_z_moja_czescia ){
       cat("\nDone\n")
 }
 
-pobieraczek( destination, plik_linkow )
+pobieraczek( "sraniewbanie", "test_linki" )
 
