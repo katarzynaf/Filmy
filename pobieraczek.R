@@ -47,7 +47,7 @@ pobieraczek <- function(from, to=from){
                   )
             )
             i=i+1
-      }
+      } 
       close(con)
     }
       cat("\nDone\n")
