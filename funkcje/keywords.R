@@ -1,5 +1,5 @@
 # keywords
-keywords <- function(link) {
+keywords <- function(link,sep=",") {
     # przejscie do unikalnej strony z keywords
     key_link <- paste0(link, "/keywords?ref_=tttg_ql_4")
     pages <- html(key_link)
@@ -8,7 +8,7 @@ keywords <- function(link) {
     if (length(key_movie) == 0) 
         return(NA)
     # zwracamy wektor
-    vec <- scal(key_movie)
+    vec <- paste0(key_movie, collapse = sep)
     names(vec) <- "keywords"
     return(vec)
 } 
