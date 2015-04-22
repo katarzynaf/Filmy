@@ -1,5 +1,6 @@
 library("stringi")
 library("XML")
+library("rvest")
 
 table_rating <- function(links,name_of_table) {
       data_frame <- do.call(rbind, lapply(links, stats_to_one_row))
@@ -38,7 +39,7 @@ save_table_rating <- function(from, to) {
             ifelse(n>1000,n<-1000,n<-n)
             how_many_times<-ceiling(n/50)
             counter<-1
-            while(counter<=how_many_times){
+            while(counter<how_many_times){
                   if(counter!=(how_many_times-1)) {
                         part_of_links<-links[(1+(counter-1)*50):(counter*50)]
                   }
