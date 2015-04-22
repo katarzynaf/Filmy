@@ -12,11 +12,7 @@ max <- as.numeric(args[4])
 
 #setwd("D://R//Filmy")
 
-scal <- function(co) {
-      paste0(co, collapse = ",")
-}
-
-from_full_cast_n_crew <- function( link ){
+from_full_cast_n_crew <- function( link,sep="," ){
       tytuly_kolumn <- c("DirectedBy","Cast","Writing","ProducedBy","MusicBy","CinematographyBy")
       
       link <- paste0(link, ifelse(stri_sub(link,-1)=="/", "", "/"), "fullcredits")
@@ -38,7 +34,7 @@ from_full_cast_n_crew <- function( link ){
       # Wydobycie *pierwszych* kolumn tabel: interesuja nas tylko nazwiska aktorow, a nie np. ze Eddie Murphy byl glosem Osla.
       info_z_cast_crew <- lapply(tytuly_kolumn, function(h){
             zawartosc_tabelki <- as.character(tables[[h]][,1])
-            scal(zawartosc_tabelki[nchar(zawartosc_tabelki)>1])
+            paste0(zawartosc_tabelki[nchar(zawartosc_tabelki)>1],collapse = sep)
             # nchar>1 dlatego, ze czasem \n bierze jako char dlugosci=1.
       })
       names(info_z_cast_crew) <- tytuly_kolumn
@@ -46,7 +42,7 @@ from_full_cast_n_crew <- function( link ){
 }
 
 # info z nodesow
-from_main_page <- function( link ){
+from_main_page <- function( link, sep="," ){
       # 1. wydlubanie informacji ze strony glownej filmu nodesami:
       all_nodes <- c(title=".header .itemprop",
                      year=".header a",                      #zwraca character => mozna zmienic na numeric
@@ -68,12 +64,12 @@ from_main_page <- function( link ){
             info_z_glownej$duration <- unlist(stri_extract_all_regex(info_z_glownej$duration,"[0-9]+"))  #zwraca character/NA
       
       # zmiana gatunkow na wiele kolumn
-      info_z_glownej$genres <- scal(info_z_glownej$genres)
+      info_z_glownej$genres <- paste0(info_z_glownej$genres,collapse=sep)
       return(as.data.frame(info_z_glownej))
 }
 
 # info z readLines
-from_page_source <- function(link) {
+from_page_source <- function(link sep=",") {
       page <- readLines(link)
       page <- paste(page, collapse = "")
       znaczniki <- c(production_countries = "(?<=Country:).+?(?=</div)", language = "(?<=Language:).+?(?=</div)", color = "(?<=Color:).+?(?=</a)")
@@ -81,7 +77,7 @@ from_page_source <- function(link) {
             item <- unlist(stri_extract_all_regex(page, znacznik))
             if (!is.na(item)) {
                   item <- unlist(stri_extract_all_regex(item, "(?<=itemprop='url'>)([a-zA-Z]| )+"))
-                  scal(item)
+                  paste0(item,collapse = sep)
             } else item <- NA
       }
       a <- sapply(znaczniki, details)
@@ -90,7 +86,7 @@ from_page_source <- function(link) {
 }
 
 # keywords
-keywords <- function(link) {
+keywords <- function(link, sep=",") {
       # przejscie do unikalnej strony z keywords
       key_link <- paste0(link, "/keywords?ref_=tttg_ql_4")
       pages <- html(key_link)
@@ -99,7 +95,7 @@ keywords <- function(link) {
       if (length(key_movie) == 0)
             return(NA)
       # zwracamy wektor
-      vec <- scal(key_movie)
+      vec <- paste0(key_movie, collapse = sep)
       names(vec) <- "keywords"
       return(vec)
 }
