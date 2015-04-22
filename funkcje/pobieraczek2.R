@@ -104,7 +104,7 @@ save_lines <- function(plik_linkow, liczba_linkow, names_of_table, ile = 100){
       i <- liczba_linkow
       con <- file(names_of_table)
       open(con,"a+")
-      while( i <= (liczba_linkow + ile - 1)){
+      while( i <= (liczba_linkow + ile)){
             link <- as.character(plik_linkow[i])
             a <- from_main_page(link)
             b <- from_full_cast_n_crew(link)
@@ -167,7 +167,7 @@ pobieraczek <- function(from, to=from, min = 1, max = 1000){
             tmp_l <- length(tmp)
             k <- 1
             while(k <= tmp_l){
-                  if(k == tmp_l) save_lines(plik_linkow, tmp[k], names_of_table[j], ile = liczba_linkow)
+                  if(k == tmp_l) save_lines(plik_linkow, tmp[k], names_of_table[j], ile = (max - tmp[k]+1))
                   else save_lines(plik_linkow, tmp[k], names_of_table[j])
                   k <- k+1
             }
