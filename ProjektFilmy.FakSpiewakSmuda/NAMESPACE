@@ -1,5 +1,0 @@
-import(RCurl)
-import(dplyr)
-import(rvest)
-import(stringi)
-exportPattern("^[^\\.]")
