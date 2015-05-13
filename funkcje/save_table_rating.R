@@ -12,7 +12,7 @@ table_rating <- function(links,name_of_table) {
       }
 }
 
-save_table_rating <- function(from, to) {
+save_table_rating <- function(from, to, mini=1, maxi=1000) {
       if (!file.exists(file.path("dane"))) {
             # jesli nie, tworzymy takowy
             dir.create(file.path("dane"))
@@ -36,18 +36,29 @@ save_table_rating <- function(from, to) {
       for (i in 1:length(files)) {
             links <- as.character(read.table(files[i], header = TRUE)$link)
             n<-length(links)
-            ifelse(n>1000,n<-1000,n<-n)
-            how_many_times<-ceiling(n/50)
+            if(n>maxi){ #pobieramy do maksimum
+               n<-maxi
+            }
+            if(mini>n){ #pomijamy ten rok gdy wyszlismy poza zakres linkow
+               next
+            }
+            how_many_times<-ceiling((n-mini)/50)
+            if(how_many_times<=1){ #gdy pobieramy conajwyzej 50 linkow
+               part_of_links<-links[mini:n]
+               table_rating(part_of_links,names_of_table[i])
+               #idziemy do kolejnego roku
+               next
+            }
             counter<-1
             while(counter<how_many_times){
-                  if(counter!=(how_many_times-1)) {
-                        part_of_links<-links[(1+(counter-1)*50):(counter*50)]
+                  if(counter!=(how_many_times-1)) { #zapis do pliku co 50 linkow
+                        part_of_links<-links[(mini+(counter-1)*50):(mini-1+counter*50)]
                   }
                   else {
-                        part_of_links<-links[(1+(counter-1)*50):n]
+                        part_of_links<-links[(mini+(counter-1)*50):n]
                   }
                   table_rating(part_of_links,names_of_table[i])
-                  gc()
+                  #gc()
                   counter<-counter+1
             }
       }
@@ -55,4 +66,4 @@ save_table_rating <- function(from, to) {
 }
 
 
-save_table_rating(from, to)
+save_table_rating(1974, 1974, 1,1000)

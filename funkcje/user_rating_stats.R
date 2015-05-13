@@ -1,8 +1,8 @@
 user_rating_stats <- function(link) {
       if (stri_sub(link, -1) == "/") {
-            link <- paste0(link, "ratings")
+            link <- paste0(link, "ratings?ref_=tt_ov_rt")
       } else {
-            link <- paste0(link, "/ratings")
+            link <- paste0(link, "/ratings?ref_=tt_ov_rt")
       }
       user_rating_stats <- readHTMLTable(link)[[2]]
       if (names(user_rating_stats)[3] != "Average") {
