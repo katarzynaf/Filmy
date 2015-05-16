@@ -1,8 +1,8 @@
 rating_stats <- function(link) {
       if (stri_sub(link, -1) == "/") {
-            link <- paste0(link, "ratings")
+            link <- paste0(link, "ratings?ref_=tt_ov_rt")
       } else {
-            link <- paste0(link, "/ratings")
+            link <- paste0(link, "/ratings?ref_=tt_ov_rt")
       }
       rating_stats <- readHTMLTable(link)[[1]]
       if (ncol(rating_stats) == 1) {
