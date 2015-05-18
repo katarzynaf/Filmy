@@ -7,7 +7,7 @@ library(stringi)
 library(parallel)
 
 wskaznik <- function(po_czym, n){
-      slowaRozdzielone <- sapply(movies10IMDB[,po_czym], function(x) stri_extract_all_words(x)[[1]])
+      slowaRozdzielone <- sapply(movies10IMDB[,po_czym], function(x) tolower(stri_extract_all_words(x)[[1]]))
       slowaRozdzielone <- slowaRozdzielone[1:n]
       ile <- detectCores()
       cl <- makeCluster(ile)
